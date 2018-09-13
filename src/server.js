@@ -1,8 +1,14 @@
 import express from "express"
+import graphql from "express-graphql"
 import next from "next"
 
-const dev = process.env.NODE_ENV !== "production"
-const pages = next({ dev })
+import schema from "./schema"
+
+const pages = next({
+  dev: process.env.NODE_ENV !== "production",
+  dir: __dirname
+})
+
 const server = express()
 
 // Nothing to see here...
@@ -10,6 +16,13 @@ server.get("/", (req, res) => {
   res.redirect(302, "/graphiql")
   res.end()
 })
+
+server.post(
+  "/graphql",
+  graphql({
+    schema
+  })
+)
 
 // Next.js is in charge!
 server.use(pages.getRequestHandler())

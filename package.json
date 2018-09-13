@@ -2,6 +2,7 @@
   "private": true,
   "name": "customized-graphiql",
   "description": "Customizing GraphiQL for Fun & Productivity",
+  "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "build": "next build",
