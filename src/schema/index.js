@@ -1,42 +1,17 @@
 import { makeExecutableSchema } from "graphql-tools"
+import { merge } from "lodash"
 
-const { version } = require("../../package.json")
+import mocks from "./mocks"
+import resolvers from "./resolvers"
+import typeDefs from "./typeDefs"
 
-const resolvers = {
-  Query: {
-    books() {
-      return [
-        {
-          title: "Harry Potter and the Chamber of Secrets",
-          author: "J.K. Rowling"
-        },
-        {
-          title: "Jurassic Park",
-          author: "Michael Crichton"
-        }
-      ]
-    },
-
-    version() {
-      return version
-    }
-  }
-}
-
-const typeDefs = `
-  type Book {
-    title: String
-    author: String
-  }
-
-  type Query {
-    version: String!
-  }
-
-  extend type Query {
-    books: [Book]
-  }
-`
+export const mockSchema = makeExecutableSchema({
+  // graphql-tools' addMockFunctionsToSchema is worthless,
+  // as it doesn't override resolvers with mocks.
+  // _.merge does, though!
+  resolvers: merge({}, resolvers, mocks),
+  typeDefs
+})
 
 export default makeExecutableSchema({
   resolvers,

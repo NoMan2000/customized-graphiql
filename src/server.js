@@ -2,7 +2,7 @@ import express from "express"
 import graphql from "express-graphql"
 import next from "next"
 
-import schema from "./schema"
+import schema, { mockSchema } from "./schema"
 
 const pages = next({
   dev: process.env.NODE_ENV !== "production",
@@ -19,8 +19,16 @@ server.get("/", (req, res) => {
 
 server.post(
   "/graphql",
-  graphql({
-    schema
+  graphql((req, res, graphqlParams) => {
+    const context = {
+      schema
+    }
+
+    if (req.query.schema === "mock") {
+      context.schema = mockSchema
+    }
+
+    return context
   })
 )
 
