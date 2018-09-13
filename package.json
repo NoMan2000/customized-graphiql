@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "next build",
-    "dev": "node -r esm src/server",
+    "dev": "nodemon --require esm src/server",
     "start": "next start"
   },
   "dependencies": {
@@ -19,5 +19,8 @@
     "next": "^6.1.2",
     "react": "^16.5.0",
     "react-dom": "^16.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.4"
   }
 }
