@@ -1,2 +1,7 @@
-# customized-graphiql
-Customizing GraphiQL for Fun &amp; Productivity
+# Customized GraphiQL
+
+> Customizing GraphiQL for Fun &amp; Productivity
+
+### Author
+
+Eric Clemmons
