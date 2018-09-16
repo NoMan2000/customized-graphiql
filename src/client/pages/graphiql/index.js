@@ -11,7 +11,7 @@ const DynamicGraphiQL = dynamic(import("../../components/CustomGraphiQL"), {
 // Next.js (or it's plugins) don't work well with:
 // `import "graphiql/graphiql.css"`
 // So, it's easier to use the CDN version for this release.
-const { version } = require("graphiql/package.json")
+const graphiqlVersion = require("graphiql/package.json").version
 
 // We're largely replicating:
 // > https://github.com/graphql/express-graphql/blob/master/src/renderGraphiQL.js
@@ -19,7 +19,7 @@ export default () => (
   <Fragment>
     <Head>
       <link
-        href={`//cdn.jsdelivr.net/npm/graphiql@${version}/graphiql.css`}
+        href={`//cdn.jsdelivr.net/npm/graphiql@${graphiqlVersion}/graphiql.css`}
         rel="stylesheet"
       />
       <style>
