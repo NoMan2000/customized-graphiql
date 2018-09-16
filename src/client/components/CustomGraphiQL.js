@@ -1,6 +1,10 @@
+import { Component, Fragment } from "react"
 import { parse, print } from "graphql"
 
+import Head from "next/head"
+
 import GraphiQL, {
+  Group,
   Logo,
   Menu,
   MenuItem,
@@ -12,9 +16,11 @@ import GraphiQL, {
 import { pick, pickBy } from "lodash"
 
 const { version } = require("../../../package.json")
+const codemirrorVersion = require("codemirror/package.json").version
 
 // `undefined` is prefered over `null`, so that GraphiQL uses `defaultQuery`
 const defaultState = {
+  editorTheme: undefined,
   query: undefined,
   schema: undefined,
   variables: undefined
@@ -30,7 +36,7 @@ const stateFromURL = Array.from(
   {}
 )
 
-export default class CustomGraphiQL extends React.Component {
+export default class CustomGraphiQL extends Component {
   ref = React.createRef()
 
   state = {
@@ -91,8 +97,15 @@ export default class CustomGraphiQL extends React.Component {
   }
 
   // Reflect (truthy) state values in the URL for copy/paste/reload
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
+    const { editorTheme = "graphiql" } = this.state
     const queryString = new URLSearchParams(pickBy(this.state)).toString()
+
+    // Update GraphiQL's editor window themes without reloading
+    const graphiql = this.ref.current
+    graphiql.queryEditorComponent.editor.setOption("theme", editorTheme)
+    graphiql.resultComponent.viewer.setOption("theme", editorTheme)
+    graphiql.variableEditorComponent.editor.setOption("theme", editorTheme)
 
     window.history.replaceState(
       null,
@@ -103,41 +116,98 @@ export default class CustomGraphiQL extends React.Component {
   }
 
   render() {
-    const { query, schema, variables } = this.state
+    const { editorTheme, query, schema, variables } = this.state
 
     return (
-      <GraphiQL
-        fetcher={this.handleFetch}
-        query={query}
-        variables={variables}
-        onEditQuery={this.handleEditQuery}
-        onEditVariables={this.handleEditVariables}
-        ref={this.ref}
-      >
-        <Logo>
-          Customized GraphiQL <small>v{version}</small>
-        </Logo>
+      <Fragment>
+        <Head>
+          <link
+            href={`https://cdnjs.cloudflare.com/ajax/libs/codemirror/${codemirrorVersion}/theme/solarized.css`}
+            rel="stylesheet"
+          />
+          <link
+            href={`https://cdnjs.cloudflare.com/ajax/libs/codemirror/${codemirrorVersion}/theme/paraiso-dark.css`}
+            rel="stylesheet"
+          />
+          <link
+            href={`https://cdnjs.cloudflare.com/ajax/libs/codemirror/${codemirrorVersion}/theme/dracula.css`}
+            rel="stylesheet"
+          />
+          <link
+            href={`https://cdnjs.cloudflare.com/ajax/libs/codemirror/${codemirrorVersion}/theme/oceanic-next.css`}
+            rel="stylesheet"
+          />
+        </Head>
 
-        <Toolbar>
-          <Select onSelect={(schema) => this.setState({ schema })}>
-            <SelectOption
-              label="Latest Schema"
-              selected={!schema}
-              value={null}
-            />
-            <SelectOption
-              label="Mock Schema"
-              selected={schema === "mock"}
-              value="mock"
-            />
-          </Select>
+        <GraphiQL
+          editorTheme={editorTheme}
+          fetcher={this.handleFetch}
+          query={query}
+          variables={variables}
+          onEditQuery={this.handleEditQuery}
+          onEditVariables={this.handleEditVariables}
+          ref={this.ref}
+        >
+          <Logo>
+            Customized GraphiQL <small>v{version}</small>
+          </Logo>
 
-          <Menu label="Export...">
-            <MenuItem label="Swift" title="Swift" />
-            <MenuItem label="TypeScript" title="TypeScript" />
-          </Menu>
-        </Toolbar>
-      </GraphiQL>
+          <Toolbar>
+            <Group>
+              <Select onSelect={(schema) => this.setState({ schema })}>
+                <SelectOption
+                  label="Default Schema"
+                  selected={!schema}
+                  value={null}
+                />
+                <SelectOption
+                  label="Mock Schema"
+                  selected={schema === "mock"}
+                  value="mock"
+                />
+              </Select>
+
+              <Menu label="Export...">
+                <MenuItem label="Swift" title="Swift" />
+                <MenuItem label="TypeScript" title="TypeScript" />
+              </Menu>
+            </Group>
+
+            <Select onSelect={(editorTheme) => this.setState({ editorTheme })}>
+              <SelectOption
+                label="Default Theme"
+                selected={!editorTheme}
+                value={undefined}
+              />
+              <SelectOption
+                label="Dracula"
+                selected={editorTheme === "dracula"}
+                value="dracula"
+              />
+              <SelectOption
+                label="Oceanic Next"
+                selected={editorTheme === "oceanic-next"}
+                value="oceanic-next"
+              />
+              <SelectOption
+                label="Paraiso Dark"
+                selected={editorTheme === "paraiso-dark"}
+                value="paraiso-dark"
+              />
+              <SelectOption
+                label="Solarized Dark"
+                selected={editorTheme === "solarized dark"}
+                value="solarized dark"
+              />
+              <SelectOption
+                label="Solarized Light"
+                selected={editorTheme === "solarized light"}
+                value="solarized light"
+              />
+            </Select>
+          </Toolbar>
+        </GraphiQL>
+      </Fragment>
     )
   }
 }
