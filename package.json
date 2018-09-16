@@ -9,6 +9,7 @@
     "deploy": "now",
     "dev": "nodemon --require esm src/server",
     "release": "CI=true np --yolo",
+    "postrelease": "$_ run deploy",
     "start": "node -r esm src/server"
   },
   "dependencies": {
