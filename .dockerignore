@@ -1,5 +1,5 @@
-#
+*
 !src
 !next.config.js
 !package.json
-!yarn.ock
+!yarn.lock
