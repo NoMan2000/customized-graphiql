@@ -8,6 +8,7 @@
     "build": "next build src/client",
     "deploy": "now",
     "dev": "nodemon --require esm src/server",
+    "release": "CI=true np --yolo",
     "start": "node -r esm src/server"
   },
   "dependencies": {
