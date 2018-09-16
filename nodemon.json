@@ -1,4 +1,3 @@
 {
-  "ignore": ["src/pages"],
-  "watch": ["src/**/*.js"]
+  "watch": ["server/**/*.js"]
 }

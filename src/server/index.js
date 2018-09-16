@@ -1,12 +1,13 @@
 import express from "express"
 import graphql from "express-graphql"
 import next from "next"
+import path from "path"
 
 import schema, { mockSchema } from "./schema"
 
 const pages = next({
   dev: process.env.NODE_ENV !== "production",
-  dir: __dirname
+  dir: path.join(__dirname, "../client")
 })
 
 const server = express()

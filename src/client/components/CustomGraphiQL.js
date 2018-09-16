@@ -11,12 +11,13 @@ import GraphiQL, {
 
 import { pick, pickBy } from "lodash"
 
-const { version } = require("../../package.json")
+const { version } = require("../../../package.json")
 
+// `undefined` is prefered over `null`, so that GraphiQL uses `defaultQuery`
 const defaultState = {
-  query: null,
-  schema: null,
-  variables: null
+  query: undefined,
+  schema: undefined,
+  variables: undefined
 }
 
 const stateFromURL = Array.from(
@@ -38,18 +39,30 @@ export default class CustomGraphiQL extends React.Component {
     ...pick(stateFromURL, Object.keys(defaultState))
   }
 
-  handleEditQuery = (query) => this.setState({ query })
+  handleEditQuery = (query) => {
+    if (!query) {
+      query = undefined
+    }
 
-  handleEditVariables = (variables) => this.setState({ variables })
+    this.setState({ query })
+  }
+
+  handleEditVariables = (variables) => {
+    if (!variables) {
+      variables = undefined
+    }
+
+    this.setState({ variables })
+  }
 
   // Prefer GraphiQL for the values of { operationName, query, variables }
-  handleFetch = (graphQLParams) => {
+  handleFetch = async (graphQLParams) => {
     // Send our custom state values (e.g. schema) as `req.query`
     const { query, variables, ...rest } = this.state
     const searchParams = new URLSearchParams(pickBy(rest))
     const url = `${window.location.origin}/graphql?${searchParams.toString()}`
 
-    return fetch(url, {
+    const res = await fetch(url, {
       method: "post",
       headers: {
         Accept: "application/json",
@@ -57,40 +70,36 @@ export default class CustomGraphiQL extends React.Component {
       },
       // Send graphQLParams as `req.body`
       body: JSON.stringify(graphQLParams)
-    }).then((res) => {
+    })
+
+    const payload = await res.json()
+
+    // 400s are returned if query/variables are invalid
+    if (res.ok && query) {
       try {
         const formatted = print(parse(query))
 
         // Format successful queries ONLY if not already formatted.
         // (Otherwise this could create a constant update loop)
-        if (!query !== formatted) {
+        if (query !== formatted) {
           this.setState({ query: formatted })
         }
-      } catch (error) {
-        // The server would have thrown on a bad error already
-        console.error(error)
-      }
+      } catch (error) {}
+    }
 
-      return res.json()
-    })
-  }
-
-  // Start our component out by reflecting the initial state of GraphiQL
-  componentDidMount() {
-    const { query, variables } = this.ref.current.state
-
-    console.log({ query, variables })
-
-    this.setState({ query, variables })
+    return payload
   }
 
   // Reflect (truthy) state values in the URL for copy/paste/reload
   componentDidUpdate() {
     const queryString = new URLSearchParams(pickBy(this.state)).toString()
 
-    if (queryString) {
-      window.history.replaceState(null, null, `?${queryString}`)
-    }
+    window.history.replaceState(
+      null,
+      null,
+      // Erase window.location.search if there's no query
+      queryString ? `?${queryString}` : window.location.pathname
+    )
   }
 
   render() {
