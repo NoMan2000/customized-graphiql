@@ -1,13 +1,12 @@
 FROM mhart/alpine-node:10 as base
-WORKDIR /app
-COPY package.json /app
-COPY yarn.lock /app
-RUN yarn --production
-COPY . /app
-RUN yarn build
+WORKDIR /usr/src
+COPY package.json yarn.lock /usr/src/
+RUN yarn install
+COPY . .
+RUN yarn build && yarn --production
 
 FROM mhart/alpine-node:base-10
-WORKDIR /app
+WORKDIR /usr/src
 ENV NODE_ENV="production"
-COPY --from=base /app /app
+COPY --from=base /usr/src .
 CMD ["node", "-r", "esm", "./src/server"]
