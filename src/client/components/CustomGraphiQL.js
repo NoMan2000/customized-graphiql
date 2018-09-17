@@ -166,11 +166,6 @@ export default class CustomGraphiQL extends Component {
                   value="mock"
                 />
               </Select>
-
-              <Menu label="Export...">
-                <MenuItem label="Swift" title="Swift" />
-                <MenuItem label="TypeScript" title="TypeScript" />
-              </Menu>
             </Group>
 
             <Select onSelect={(editorTheme) => this.setState({ editorTheme })}>
