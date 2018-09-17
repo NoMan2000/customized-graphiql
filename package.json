@@ -5,9 +5,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "next build",
+    "build": "next build src/client",
+    "deploy": "now",
     "dev": "nodemon --require esm src/server",
-    "start": "next start"
+    "release": "CI=true np --yolo",
+    "postrelease": "$_ run deploy",
+    "start": "node --require esm src/server"
   },
   "dependencies": {
     "esm": "^3.0.82",
@@ -22,6 +25,8 @@
     "react-dom": "^16.5.0"
   },
   "devDependencies": {
-    "nodemon": "^1.18.4"
+    "nodemon": "^1.18.4",
+    "now": "^11.4.4",
+    "np": "^3.0.4"
   }
 }
