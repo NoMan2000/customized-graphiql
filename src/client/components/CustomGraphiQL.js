@@ -149,7 +149,9 @@ export default class CustomGraphiQL extends Component {
           ref={this.ref}
         >
           <Logo>
-            Customized GraphiQL <small>v{version}</small>
+            <a href="https://github.com/ericclemmons/customized-graphiql">
+              Customized GraphiQL <small>v{version}</small>
+            </a>
           </Logo>
 
           <Toolbar>
